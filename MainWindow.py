@@ -8,9 +8,10 @@ class MainWindow(QMainWindow):
     openImageRequest = pyqtSignal()
     saveImageRequest = pyqtSignal()
     saveAsImageRequest = pyqtSignal()
-    useFirstFilterRequest = pyqtSignal()
+    useFastNlMeansDenoisingRequest = pyqtSignal()
     useSecondFilterRequest = pyqtSignal()
     showAboutDialogRequest = pyqtSignal()
+    updateImage = pyqtSignal(int, int)
 
     def __init__(self):
         super().__init__()
@@ -47,9 +48,17 @@ class MainWindow(QMainWindow):
         # Filter menu
         filterMenu = mainMenu.addMenu("Fil&ter")
 
-        # --> First filter
-        firstFilterAction = filterMenu.addAction("First filter")
-        firstFilterAction.triggered.connect(self.useFirstFilterRequest)
+        # --> OpenCV filters
+        opencvFiltersMenu = filterMenu.addMenu("OpenCV filters")
+
+        # --> --> FastNlMeansDenoising
+        fastNlMeansDenoisingAction = opencvFiltersMenu.addAction("FastNlMeansDenoising filter")
+        fastNlMeansDenoisingAction.triggered.connect(self.useFastNlMeansDenoisingRequest)
+        fastNlMeansDenoisingAction.setShortcuts(QKeySequence("Ctrl+1"))
+
+        # --> --> Erode
+        #erodeFilterAction = opencvFilterMenu.addAction("Erode filter")
+        #erodeFilterAction.triggered.connect(self.useErodeFilterRequest)
 
         # --> Second filter
         secondFilterAction = filterMenu.addAction("Second filter")
@@ -65,6 +74,10 @@ class MainWindow(QMainWindow):
     def initCentralWidget(self):
         self.centrWidget = ShowWidget(self)
         self.setCentralWidget(self.centrWidget)
+        self.centrWidget.updateImage.connect(self.updateImage)
 
-    def setImage(self, image):
-        self.centrWidget.setImage(image)
+    def setImages(self, imageNames, imageOrders):
+        self.centrWidget.setImages(imageNames, imageOrders)
+
+    def setImage(self, box, image):
+        self.centrWidget.setImage(box, image)
